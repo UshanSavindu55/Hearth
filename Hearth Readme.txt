@@ -1,88 +1,72 @@
 🧠 Hearth – Your AI-Powered Mental Health Chatbot
 
-📌 What’s Hearth?
-Hearth is a chatbot I built to support people going through tough times with their mental health. It’s designed to have real conversations, pick up on how you’re feeling, and respond with kindness and understanding. If things get serious, it can also guide you to helpful resources or escalate the conversation.
-This project has been a great learning experience for me — combining AI, backend development, and frontend design — and I’m excited to keep making it better.
-Right now, Hearth uses OpenAI’s language model to understand and respond, but I’m planning to add other smart tools like Hugging Face and Cohere to improve how it detects emotions and crisis situations.
+Overview
 
-✨ What Hearth Can Do
-🔐 Secure login with Spring Security and JWT to keep your info safe
+Hearth is an AI-driven chatbot designed to support individuals navigating mental health challenges. It engages in empathetic conversations, accurately detects emotional tone, and offers compassionate responses. In critical situations, Hearth can escalate the conversation or guide users to appropriate resources.
+This project has been an enriching experience combining AI integration, backend development, and frontend design. Currently leveraging OpenAI’s language model, I plan to incorporate additional AI tools like Hugging Face and Cohere to enhance emotion recognition and crisis detection.
 
-💬 Chat with an AI that listens and responds with empathy
 
-😔 Understand emotional tones to better support you
+✨ Features
 
-🚨 Plan to add crisis detection and escalation for urgent help
+Secure Login: Implemented with Spring Security and JWT to protect user data
+Empathetic Chat: AI that listens carefully and responds with kindness
+Emotion Recognition: Detects and interprets emotional tones in messages
+Crisis Support (Upcoming): Plans to add automatic crisis detection and escalation
+Conversation History: Safely stores chats using PostgreSQL
+Responsive UI: Smooth, accessible chat interface optimized for all devices
+Modular Backend: Clean architecture for easy integration of new AI features
 
-💾 Save your conversation history safely in PostgreSQL
 
-🌐 Responsive chat interface that works smoothly on any device
+🛠️ Technology Stack
 
-📦 Clean and modular backend so I can easily add new AI features
+Layer	Technologies
+Backend	Java, Spring Boot, Spring Security, JWT
+Frontend	React.js, HTML, CSS, JavaScript
+Database	PostgreSQL (self-hosted or cloud)
+AI APIs	OpenAI (current), Hugging Face & Cohere (planned)
+Tools	Postman, IntelliJ IDEA
 
-🛠️ Tech Behind the Scenes
-
-Backend	- Java, Spring Boot, Spring Security, JWT
-Frontend - React.js, HTML, CSS, JavaScript
-Database - PostgreSQL (self-hosted or cloud-based)
-AI APIs	OpenAI (today), Hugging Face & Cohere (soon)
-Tools - Postman, IntelliJ IDEA
 
 🧠 How AI Powers Hearth
-When you chat with Hearth, your messages are sent to OpenAI’s API where:
 
-It picks up on your emotional tone and mood
+When users chat with Hearth:
+Messages are sent to OpenAI’s API
+The AI analyzes emotional tone and mood
+Generates thoughtful, empathetic responses focused on mental health support
 
-Crafts thoughtful, empathetic replies
 
-Keeps the focus on mental health support
+🔮 Roadmap / What’s Next
 
-🔮 What’s Next?
-Add Hugging Face models for even better emotion recognition
+Integrate Hugging Face models for advanced emotion recognition
+Add Cohere for improved crisis and intent detection
+Implement feedback loops to refine conversations over time
+Expand multilingual support for broader accessibility
+Enhance accessibility features to welcome all users
 
-Bring in Cohere to spot crises and important intents more accurately
+🧩 Project Structure
 
-🧩 How the Project is Organized
-graphql
-Copy
-Edit
 hearth-chatbot/
 ├── backend/        # Spring Boot REST API  
 ├── frontend/       # React chat interface  
 ├── db/             # PostgreSQL setup and migrations  
-├── docs/           # API details and prompt designs  
-└── README.md       # This file  
-📚 What I’ve Learned
-Building secure, scalable backend services with Spring Boot
+├── docs/           # API documentation and prompt design  
+└── README.md       # Project overview and setup instructions 
+ 
 
-Integrating powerful AI APIs like OpenAI
+📚 Lessons Learned
 
-Crafting prompts to get sensitive, thoughtful AI responses
+Building secure and scalable backend services with Spring Boot
+Integrating AI APIs like OpenAI effectively
+Designing thoughtful AI prompts for sensitive conversations
+Creating responsive and accessible user interfaces with React
+Safely storing user data with PostgreSQL
+Addressing real-world concerns like ethical AI use and crisis escalation
 
-Designing smooth, responsive user interfaces with React
 
-Storing user chats safely using PostgreSQL
+🚀 Getting Started
 
-Tackling real-world issues like safety, escalation, and ethical AI use
-
-🚀 What’s Coming Up
-Better emotion detection with Hugging Face
-
-Smarter crisis detection using Cohere
-
-Feedback loops to improve conversations over time
-
-Multilingual support so more people can use Hearth
-
-Accessibility improvements to make Hearth welcoming for everyone
-
-🧑‍💻 Ready to Try Hearth?
-Clone this repo
-
-Set up the backend with Spring Boot and connect PostgreSQL
-
-Start the React frontend
-
+Clone the repository
+Set up the backend using Spring Boot and connect PostgreSQL
+Launch the React frontend
 Add your OpenAI API key to .env or application.properties
-
-Start chatting with Hearth and feel heard!
+Start chatting with Hearth and experience compassionate AI support

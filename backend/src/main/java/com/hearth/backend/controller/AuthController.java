@@ -1,5 +1,6 @@
 package com.hearth.backend.controller;
 
+import com.hearth.backend.dto.LogInRequest;
 import com.hearth.backend.dto.SignUpRequest;
 import com.hearth.backend.service.AuthService;
 
@@ -17,5 +18,10 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignUpRequest request) {
         return authService.signup(request);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LogInRequest request){
+        return authService.login(request);
     }
 }

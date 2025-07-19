@@ -16,9 +16,6 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignUpRequest request) {
-        System.out.println("Controller: Received signup request for email: " + request.getEmail());
-        return ResponseEntity.ok("Request reached controller, stopping here.");
-
-//        return authService.signup(request);
+        return authService.signup(request);
     }
 }

@@ -9,6 +9,8 @@ import com.hearth.backend.model.User;
 import com.hearth.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,6 +25,9 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public ResponseEntity<?> signup(SignUpRequest signupRequest) {
 
@@ -43,22 +48,29 @@ public class AuthService {
     }
 
     public ResponseEntity<?> login(LogInRequest request) {
-        Optional<User> extUser = userRepository.findByEmail(request.getEmail());
-        if(extUser.isEmpty()){
-            throw new InvalidCredentialsException("Invalid email or password");
-        }
-
-        User user = extUser.get();
-
-        String rawPassword = request.getPassword();
-        String hashedPassword = user.getPassword();
-
-        boolean passwordsMatch = passwordEncoder.matches(rawPassword, hashedPassword);
-
-        if(!passwordsMatch) {
-            throw new InvalidCredentialsException("Invalid email or password");
-        }
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
+        authenticationManager.authenticate(authToken);
         return ResponseEntity.ok(Map.of("message", "User login successfully"));
     }
+
+//    public ResponseEntity<?> login(LogInRequest request) {
+//        Optional<User> extUser = userRepository.findByEmail(request.getEmail());
+//        if(extUser.isEmpty()){
+//            throw new InvalidCredentialsException("Invalid email or password");
+//        }
+//
+//        User user = extUser.get();
+//
+//        String rawPassword = request.getPassword();
+//        String hashedPassword = user.getPassword();
+//
+//        boolean passwordsMatch = passwordEncoder.matches(rawPassword, hashedPassword);
+//
+//        if(!passwordsMatch) {
+//            throw new InvalidCredentialsException("Invalid email or password");
+//        }
+//        return ResponseEntity.ok(Map.of("message", "User login successfully"));
+//    }
 
 }

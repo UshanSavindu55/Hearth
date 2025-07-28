@@ -2,18 +2,21 @@ package com.hearth.backend.service;
 
 import com.hearth.backend.dto.LogInRequest;
 import com.hearth.backend.dto.SignUpRequest;
+import com.hearth.backend.security.JwtService;
 import com.hearth.backend.exception.EmailAlreadyUsedException;
 import com.hearth.backend.exception.PasswordMismatchException;
-import com.hearth.backend.exception.InvalidCredentialsException;
 import com.hearth.backend.model.User;
 import com.hearth.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -24,9 +27,14 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<?> signup(SignUpRequest signupRequest) {
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-        if(!signupRequest.getPassword().equals(signupRequest.getConfirmPassword())) {
+    @Autowired
+    private JwtService jwtService;
+
+    public ResponseEntity<?> signup(SignUpRequest signupRequest) {
+        if (!signupRequest.getPassword().equals(signupRequest.getConfirmPassword())) {
             throw new PasswordMismatchException("Passwords do not match");
         }
 
@@ -43,22 +51,22 @@ public class AuthService {
     }
 
     public ResponseEntity<?> login(LogInRequest request) {
-        Optional<User> extUser = userRepository.findByEmail(request.getEmail());
-        if(extUser.isEmpty()){
-            throw new InvalidCredentialsException("Invalid email or password");
-        }
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
 
-        User user = extUser.get();
+        Authentication authentication = authenticationManager.authenticate(authToken);
 
-        String rawPassword = request.getPassword();
-        String hashedPassword = user.getPassword();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        boolean passwordsMatch = passwordEncoder.matches(rawPassword, hashedPassword);
+        String token = jwtService.generateToken(userDetails.getUsername());
 
-        if(!passwordsMatch) {
-            throw new InvalidCredentialsException("Invalid email or password");
-        }
-        return ResponseEntity.ok(Map.of("message", "User login successfully"));
+        return ResponseEntity.ok(Map.of(
+                "message", "User authenticated successfully",
+                "token", token
+        ));
     }
-
 }
+
+
+
+

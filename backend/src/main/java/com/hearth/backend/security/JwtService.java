@@ -1,5 +1,6 @@
 package com.hearth.backend.security;
 
+import com.hearth.backend.exception.InvalidJwtAuthenticationException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,13 +12,13 @@ import java.util.Base64;
 import java.util.Date;
 
 @Component
-public class JwtUtil {
+public class JwtService {
 
     @Value("${jwt.secret.key}")
     private String secretKeyBase64;
 
     @Value("${jwt.expiration.time}")
-    private long jwtExpiration;
+    private  long jwtExpiration;
 
     private SecretKey secretKey;
 
@@ -32,7 +33,7 @@ public class JwtUtil {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(secretKey)  // Use SecretKey here
+                .signWith(secretKey)
                 .compact();
     }
 
@@ -45,15 +46,16 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    public boolean validateToken(String token) {
+    public void validateTokenOrThrow(String token) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(token);
-            return true;
+        } catch (ExpiredJwtException e) {
+            throw new InvalidJwtAuthenticationException("Token has expired");
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            throw new InvalidJwtAuthenticationException("Invalid token");
         }
     }
 }

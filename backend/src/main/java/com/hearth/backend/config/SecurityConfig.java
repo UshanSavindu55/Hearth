@@ -1,5 +1,6 @@
 package com.hearth.backend.config;
 
+import com.hearth.backend.security.JwtAuthenticationFilter;
 import com.hearth.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

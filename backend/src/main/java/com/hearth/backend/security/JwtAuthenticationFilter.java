@@ -88,4 +88,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             e.printStackTrace();
             sendErrorResponse(response, "error", "Unexpected authentication error", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+    }
 }
+

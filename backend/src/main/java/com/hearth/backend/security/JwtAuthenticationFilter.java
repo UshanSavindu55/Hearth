@@ -28,6 +28,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     private boolean isPublicEndpoint(String path) {
         return path.startsWith("/api/auth") || path.equals("/") || path.equals("/error");
@@ -41,8 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        ObjectMapper mapper = new ObjectMapper();
-        response.getWriter().write(mapper.writeValueAsString(error));
+        response.getWriter().write(objectMapper.writeValueAsString(error));
     }
 
     @Override

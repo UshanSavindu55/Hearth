@@ -66,19 +66,26 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(InvalidJwtAuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidJwt(InvalidJwtAuthenticationException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                new ErrorResponse("token", ex.getMessage(), HttpStatus.UNAUTHORIZED.value())
+    @ExceptionHandler(JwtTokenMissingException.class)
+    public ResponseEntity<ErrorResponse> handleJwtMissing(JwtTokenMissingException ex) {
+        ErrorResponse error = new ErrorResponse(
+                "Authorization",
+                "Authentication token is missing or malformed.",
+                HttpStatus.UNAUTHORIZED.value()
         );
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(JwtTokenMissingException.class)
-    public ResponseEntity<ErrorResponse> handleMissingJwt(JwtTokenMissingException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ErrorResponse("token", ex.getMessage(), HttpStatus.BAD_REQUEST.value())
+    @ExceptionHandler(InvalidJwtAuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidJwt(InvalidJwtAuthenticationException ex) {
+        ErrorResponse error = new ErrorResponse(
+                "Authorization",
+                "Authentication token is invalid or expired.",
+                HttpStatus.UNAUTHORIZED.value()
         );
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {

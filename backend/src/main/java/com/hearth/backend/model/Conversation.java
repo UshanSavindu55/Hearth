@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -12,11 +13,13 @@ public class Conversation {
     @GeneratedValue(strategy = GenerationType.IDENTITY )
     private Long conversationId;
 
-    private String title;
-
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    private String title;
     private LocalDateTime startedAt;
+
+    @OneToMany(mappedBy = "conversation")
+    private List<Message> messages;
 }

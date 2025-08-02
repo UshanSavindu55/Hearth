@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatResponse {
-    private String reply;
+public class Emotion {
     private String emotion;
-
+    private double score;
 }

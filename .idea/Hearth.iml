@@ -32,5 +32,10 @@
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-config:6.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-crypto:6.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-web:6.5.1" level="project" />
+    <orderEntry type="library" name="Maven: com.cohere:cohere-java:1.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-core:6.2.8" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:6.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-tx:6.2.8" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-orm:6.2.8" level="project" />
   </component>
 </module>

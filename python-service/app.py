@@ -13,13 +13,9 @@ def detect_emotion():
         return jsonify({"error": "Please provide a message"}), 400
     
     results = classifier(message)
-    
-    top_emotions = [
-        {"emotion": res["label"], "score": float(res["score"])}
-        for res in results[0]
-    ]
 
-    return jsonify({"top_emotions": top_emotions})
+    emotions = {res["label"]: float(res["score"]) for res in results[0]}
+    return jsonify({"emotions": emotions})
 
 if __name__ == '__main__':
     app.run(port=5000)

@@ -1,53 +1,71 @@
 🧠 Hearth – Your AI-Powered Mental Health Chatbot
-
 Overview
+Hearth is an AI-driven chatbot designed to support individuals navigating mental health challenges. It engages in empathetic conversations, detects emotional tones, and offers compassionate responses. In critical situations, Hearth guides users toward appropriate support and resources.
 
-Hearth is an AI-driven chatbot designed to support individuals navigating mental health challenges. It engages in empathetic conversations, accurately detects emotional tone, and offers compassionate responses. In critical situations, Hearth can escalate the conversation or guide users to appropriate resources.
-This project has been an enriching experience combining AI integration, backend development, and frontend design. Currently leveraging OpenAI’s language model, I plan to incorporate additional AI tools like Hugging Face and Cohere to enhance emotion recognition and crisis detection.
+This project combines AI integration, backend development, and frontend design. Currently, Hearth leverages Cohere for natural language responses and custom Hugging Face models (served via a Python microservice) for emotion detection and mental health relevance scoring.
 
 
 ✨ Features
 
-Secure Login: Implemented with Spring Security and JWT to protect user data
-Empathetic Chat: AI that listens carefully and responds with kindness
-Emotion Recognition: Detects and interprets emotional tones in messages
-Crisis Support (Upcoming): Plans to add automatic crisis detection and escalation
-Conversation History: Safely stores chats using PostgreSQL
-Responsive UI: Smooth, accessible chat interface optimized for all devices
-Modular Backend: Clean architecture for easy integration of new AI features
+Secure Login: User authentication powered by Spring Security and JWT
+
+Empathetic AI Chat: Responses generated via Cohere, focused on compassion and clarity
+
+Emotion & Relevance Detection: Uses Hugging Face models to analyze emotional tone and assess if a message is mental health–related
+
+Crisis Support (Upcoming): Plans for automated crisis detection and escalation
+
+Conversation History: Securely stores chats in a PostgreSQL database
+
+Responsive UI: A modern, accessible chat interface built with React.js
+
+Modular Architecture: Designed for easy integration of new AI services and features
 
 
 🛠️ Technology Stack
 
-Layer	Technologies
-Backend	Java, Spring Boot, Spring Security, JWT
-Frontend	React.js, HTML, CSS, JavaScript
-Database	PostgreSQL (self-hosted or cloud)
-AI APIs	OpenAI (current), Hugging Face & Cohere (planned)
-Tools	Postman, IntelliJ IDEA
+Backend - Java, Spring Boot, Spring Security, JWT
+Frontend - React.js, HTML, CSS, JavaScript
+Database - PostgreSQL 
+AI Backend - Cohere API, Python microservice with Hugging Face models
+Tools - Postman, IntelliJ IDEA, Docker (for Python services)
 
 
 🧠 How AI Powers Hearth
 
-When users chat with Hearth:
-Messages are sent to OpenAI’s API
-The AI analyzes emotional tone and mood
-Generates thoughtful, empathetic responses focused on mental health support
+When users interact with Hearth:
 
+User messages are sent to the backend.
+
+The backend forwards messages to a Python microservice, which uses:
+
+Hugging Face models for emotion detection
+
+A custom model to check relevance to mental health
+
+If the message is relevant, the backend sends it to the Cohere API, which generates a thoughtful, empathetic response.
+
+The response is returned to the frontend and stored securely if logging is enabled.
 
 🔮 Roadmap / What’s Next
 
-Integrate Hugging Face models for advanced emotion recognition
-Add Cohere for improved crisis and intent detection
-Implement feedback loops to refine conversations over time
-Expand multilingual support for broader accessibility
-Enhance accessibility features to welcome all users
+Add automatic crisis detection and escalation
+
+Expand multilingual support
+
+Improve accessibility for screen readers and assistive tech
+
+Implement feedback loops to refine response quality
+
+Train custom models for finer-grained emotion and intent detection
+
 
 🧩 Project Structure
 
-hearth-chatbot/
+hearth/
 ├── backend/        # Spring Boot REST API  
 ├── frontend/       # React chat interface  
+├── python-service/     # Python microservice with Hugging Face models  
 ├── db/             # PostgreSQL setup and migrations  
 ├── docs/           # API documentation and prompt design  
 └── README.md       # Project overview and setup instructions 
@@ -55,18 +73,31 @@ hearth-chatbot/
 
 📚 Lessons Learned
 
-Building secure and scalable backend services with Spring Boot
-Integrating AI APIs like OpenAI effectively
-Designing thoughtful AI prompts for sensitive conversations
-Creating responsive and accessible user interfaces with React
-Safely storing user data with PostgreSQL
-Addressing real-world concerns like ethical AI use and crisis escalation
+Designing secure, scalable services with Spring Boot
+
+Integrating Cohere and managing API responses for sensitive topics
+
+Building and deploying Python microservices with Hugging Face models
+
+Creating responsive, accessible UI with React
+
+Addressing ethical AI use, user privacy, and mental health safety concerns
+
+Implementing model inference pipelines to blend relevance and emotion detection before response generation
 
 
 🚀 Getting Started
 
 Clone the repository
-Set up the backend using Spring Boot and connect PostgreSQL
+
+Set up the backend with Spring Boot
+
+Connect to PostgreSQL
+
+Run the Python AI microservice for emotion/relevance detection
+
+Add your Cohere API key to the appropriate config (.env or application.properties)
+
 Launch the React frontend
-Add your OpenAI API key to .env or application.properties
-Start chatting with Hearth and experience compassionate AI support
+
+Start chatting with Hearth — an AI that listens and cares 💬

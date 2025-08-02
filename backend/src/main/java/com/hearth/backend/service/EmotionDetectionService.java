@@ -50,7 +50,8 @@ public class EmotionDetectionService {
                         emotionScores.add(new Emotion(entry.getKey(), entry.getValue()));
                     }
 
-                    System.out.println("✅ Emotions received: " + emotionScores);
+                    System.out.println("Emotions received:");
+                    emotionScores.forEach(e -> System.out.println(e.getEmotion() + ": " + String.format("%.4f", e.getScore())));
 
                     if (!emotionScores.isEmpty()) {
                         return emotionScores;

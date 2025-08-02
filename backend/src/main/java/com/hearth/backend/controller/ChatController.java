@@ -5,6 +5,7 @@ import com.hearth.backend.dto.ChatResponse;
 import com.hearth.backend.dto.Emotion;
 import com.hearth.backend.service.ChatService;
 import com.hearth.backend.service.EmotionDetectionService;
+import com.hearth.backend.service.MentalHealthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,13 +28,15 @@ public class ChatController {
     @Autowired
     private EmotionDetectionService emotionDetectionService;
 
+    @Autowired
+    MentalHealthService mentalHealthService;
 
     @PostMapping
     public ResponseEntity<ChatResponse> chat(@Valid @RequestBody ChatRequest request, Principal principal){
         String username = principal.getName();
         String userMessage = request.getMessage();
 
-
+        double relevancy_score = mentalHealthService.checkRelevancyScore(userMessage);
         List<Emotion> emotions = emotionDetectionService.detectEmotion(userMessage);
 
         String cohereResponse = chatService.processUserMessage(userMessage,emotions);

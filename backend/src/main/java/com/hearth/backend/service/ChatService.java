@@ -1,6 +1,8 @@
 package com.hearth.backend.service;
 
 import com.hearth.backend.dto.Emotion;
+import com.hearth.backend.repository.ConversationRepository;
+import com.hearth.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,8 @@ import java.util.List;
 public class ChatService {
 
     private final CohereService cohereService;
+    private final UserRepository userRepository;
+    private final ConversationRepository conversationRepository;
 
     private String emotionPromptCreator(List<Emotion> emotions) {
         StringBuilder sb = new StringBuilder();
@@ -30,7 +34,16 @@ public class ChatService {
         String emotionContext = emotionPromptCreator(emotions);
         String fullPrompt = "Emotions: " + emotionContext + ". User says: " + message
                 + "\nRespond empathetically like a friend and do not mention the emotion scores";
-        return cohereService.getChatResponse(fullPrompt);
+
+//        User user = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        Conversation conversation = conversationRepository.findById(conversationId)
+//                .orElseThrow(() -> new RuntimeException("Conversation not found"));
+
+        String botResponse = cohereService.getChatResponse(fullPrompt);
+        return botResponse;
+
     }
 
 }

@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class ChatRequest {
     @NotBlank(message = "Enter a message")
     private String message;
+    private Long conversationId;
 }

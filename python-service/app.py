@@ -32,12 +32,11 @@ def detect_relevancy():
     labels = ["mental health", "not mental health"]
     result = relevancy_classifier(message, labels)
 
-    relevancy = {
-        "label" : result["labels"][0],
-        "score" : float(result["scores"][0])
-    }
+    mental_health_score = float(
+        result["scores"][result["labels"].index("mental health")]
+    )
 
-    return jsonify({"relevancy": relevancy})
+    return jsonify({"relevancy_score": mental_health_score})
 
 if __name__ == '__main__':
     app.run(port=5000)

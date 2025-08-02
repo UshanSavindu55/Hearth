@@ -29,7 +29,7 @@ public class ChatService {
     public String processUserMessage(String message, List<Emotion> emotions) {
         String emotionContext = emotionPromptCreator(emotions);
         String fullPrompt = "Emotions: " + emotionContext + ". User says: " + message
-                + "\nRespond empathetically but do not mention the emotion scores.";
+                + "\nRespond empathetically like a friend and do not mention the emotion scores";
         return cohereService.getChatResponse(fullPrompt);
     }
 

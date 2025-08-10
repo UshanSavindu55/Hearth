@@ -6,6 +6,7 @@ import com.hearth.backend.model.User;
 import com.hearth.backend.repository.ConversationRepository;
 import com.hearth.backend.repository.MessageRepository;
 import com.hearth.backend.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,7 +42,7 @@ public class ConversationService {
     }
 
     public List<Message> getMessages(Long conversationId) {
-        return messageRepo.findByConversationIdOrderByTimestampAsc(conversationId);
+        return messageRepo.findByConversationConversationIdOrderByTimestampAsc(conversationId);
     }
 
 }

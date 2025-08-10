@@ -20,11 +20,20 @@
         @JoinColumn(name = "user_id", nullable = false)
         private User user;
 
+        @Column(columnDefinition = "TEXT")
         private String content;
+
         private LocalDateTime timestamp;
 
         @Enumerated(EnumType.STRING)
         private Sender sender;
+
+        @PrePersist
+        public void prePersist() {
+            if (timestamp == null) {
+                timestamp = LocalDateTime.now();
+            }
+        }
 
         public enum Sender {
             USER,

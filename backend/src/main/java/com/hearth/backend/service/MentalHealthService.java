@@ -3,6 +3,7 @@ package com.hearth.backend.service;
 import com.hearth.backend.dto.ChatResponse;
 import com.hearth.backend.dto.Emotion;
 
+import com.hearth.backend.model.Message;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,19 +23,25 @@ public class MentalHealthService {
     }
 
     //Handling the user prompt with the relevant business logics
-    public ChatResponse handleUserMessage(String username, String userMessage){
+    public ChatResponse handleUserMessage(Long conversationId, String email, String userMessage){
+        Long convId = chatService.getOrCreateConversation(conversationId, email);
+        chatService.saveMessage(convId, userMessage, Message.Sender.USER);
         double relevancy_score = relevancyDetectionService.checkRelevancyScore(userMessage);
+        String botResponse;
         if(relevancy_score > 0.5){
             List<Emotion> emotions = emotionDetectionService.detectEmotion(userMessage);
-            String cohereResponse = chatService.processUserMessage(userMessage, emotions);
-            return new ChatResponse(cohereResponse);
+            botResponse = chatService.processUserMessageAndSaveResponse(conversationId, userMessage, emotions);
         }
         else if(relevancy_score >= 0.4){
-            return new ChatResponse("I’m here to listen. Could you share a bit more about how this situation makes you feel?");
+            botResponse = "I’m here to listen. Could you share a bit more about how this situation makes you feel?";
+            chatService.saveMessage(conversationId, botResponse, Message.Sender.BOT);
         }
         else {
-            return new ChatResponse("It’s important to talk about what’s on your mind. Could you please ask a question related to your mental health?");
+            botResponse = "It’s important to talk about what’s on your mind. Could you please ask a question related to your mental health?";
+            chatService.saveMessage(conversationId, botResponse, Message.Sender.BOT);
         }
+
+        return new ChatResponse(botResponse);
     }
 
 

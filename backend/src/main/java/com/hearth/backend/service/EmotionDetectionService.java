@@ -31,6 +31,7 @@ public class EmotionDetectionService {
 
         try {
             String emotionApiUrl = "http://localhost:5000/detect-emotion";
+            System.out.println("📝 Message: " + message);
 
             ResponseEntity<Map<String, Map<String, Double>>> response = restTemplate.exchange(
                     emotionApiUrl,
@@ -48,6 +49,9 @@ public class EmotionDetectionService {
                     for (Map.Entry<String, Double> entry : emotionsMap.entrySet()) {
                         emotionScores.add(new Emotion(entry.getKey(), entry.getValue()));
                     }
+
+                    System.out.println("Emotions received:");
+                    emotionScores.forEach(e -> System.out.println(e.getEmotion() + ": " + String.format("%.4f", e.getScore())));
 
                     if (!emotionScores.isEmpty()) {
                         return emotionScores;

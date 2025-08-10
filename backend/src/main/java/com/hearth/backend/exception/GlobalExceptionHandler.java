@@ -1,5 +1,6 @@
 package com.hearth.backend.exception;
 
+import com.hearth.backend.service.MentalHealthService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,6 +93,16 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 "emotion",
                 "Emotion detection service is temporarily unavailable.",
+                HttpStatus.SERVICE_UNAVAILABLE.value()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+    @ExceptionHandler(MentalHealthServiceException.class)
+    public ResponseEntity<ErrorResponse> handleMentalHealthServiceException(MentalHealthServiceException ex) {
+        ErrorResponse error = new ErrorResponse(
+                "Mental health",
+                "Mental health service is temporarily unavailable.",
                 HttpStatus.SERVICE_UNAVAILABLE.value()
         );
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);

@@ -32,8 +32,10 @@ public class ChatService {
 
     public String processUserMessage(String message, List<Emotion> emotions) {
         String emotionContext = emotionPromptCreator(emotions);
-        String fullPrompt = "Emotions: " + emotionContext + ". User says: " + message
-                + "\nRespond empathetically like a friend and do not mention the emotion scores";
+        String fullPrompt = "You are a compassionate mental health counselor. " +
+                "Based on the user's emotions: " + emotionContext + ", " +
+                "respond empathetically and thoughtfully to the user's message: \"" + message + "\". " +
+                "Provide support and understanding without referring to the emotion data explicitly.";
 
 //        User user = userRepository.findByUsername(username)
 //                .orElseThrow(() -> new RuntimeException("User not found"));

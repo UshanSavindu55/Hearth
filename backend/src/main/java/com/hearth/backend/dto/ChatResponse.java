@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatResponse {
     private String reply;
-    private String emotion;
 
 }

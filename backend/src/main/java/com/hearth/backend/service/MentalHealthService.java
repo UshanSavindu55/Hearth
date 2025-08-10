@@ -1,47 +1,41 @@
 package com.hearth.backend.service;
 
-import com.hearth.backend.dto.RelevancyResponse;
-import com.hearth.backend.exception.EmotionServiceException;
-import com.hearth.backend.exception.MentalHealthServiceException;
-import org.springframework.http.*;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import com.hearth.backend.dto.ChatResponse;
+import com.hearth.backend.dto.Emotion;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class MentalHealthService {
-    private final RestTemplate restTemplate;
+    private final EmotionDetectionService emotionDetectionService;
+    private final RelevancyDetectionService relevancyDetectionService;
+    private final ChatService chatService;
 
-    public MentalHealthService(RestTemplate restTemplate){
-        this.restTemplate = restTemplate;
+    public MentalHealthService(ChatService chatService,
+                               RelevancyDetectionService relevancyDetectionService,
+                               EmotionDetectionService emotionDetectionService) {
+        this.chatService = chatService;
+        this.relevancyDetectionService = relevancyDetectionService;
+        this.emotionDetectionService = emotionDetectionService;
     }
 
-    public double checkRelevancyScore(String message){
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("message", message);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
-        try{
-            String relevancyApiUrl = "http://localhost:5000/detect-relevancy";
-            ResponseEntity<RelevancyResponse> response = restTemplate.postForEntity(
-                    relevancyApiUrl, requestEntity, RelevancyResponse.class
-            );
-
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                System.out.println("🔍 Relevancy Score Received: " + response.getBody().getRelevancy_score());
-                return response.getBody().getRelevancy_score();
-            }
-
-            System.out.println("No response body or status not OK. Returning 0.0");
-            return 0.0;
-        }catch (Exception e) {
-            throw new MentalHealthServiceException("Failed to connect to mental health service", e);
+    //Handling the user prompt with the relevant business logics
+    public ChatResponse handleUserMessage(String username, String userMessage){
+        double relevancy_score = relevancyDetectionService.checkRelevancyScore(userMessage);
+        if(relevancy_score > 0.5){
+            List<Emotion> emotions = emotionDetectionService.detectEmotion(userMessage);
+            String cohereResponse = chatService.processUserMessage(userMessage, emotions);
+            return new ChatResponse(cohereResponse);
+        }
+        else if(relevancy_score >= 0.4){
+            return new ChatResponse("I’m here to listen. Could you share a bit more about how this situation makes you feel?");
+        }
+        else {
+            return new ChatResponse("It’s important to talk about what’s on your mind. Could you please ask a question related to your mental health?");
         }
     }
+
 
 }

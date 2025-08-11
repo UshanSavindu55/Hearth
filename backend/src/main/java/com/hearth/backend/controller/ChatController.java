@@ -10,10 +10,7 @@ import com.hearth.backend.service.MentalHealthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -32,11 +29,13 @@ public class ChatController {
     MentalHealthService mentalHealthService;
 
     @PostMapping
-    public ResponseEntity<ChatResponse> chat(@Valid @RequestBody ChatRequest request, Principal principal){
-        String username = principal.getName();
+    public ResponseEntity<ChatResponse> chat(@RequestParam(required = false) Long conversationId,
+                                             @Valid @RequestBody ChatRequest request,
+                                             Principal principal){
+        String email = principal.getName();
         String userMessage = request.getMessage();
 
-        ChatResponse response = mentalHealthService.handleUserMessage(username, userMessage);
+        ChatResponse response = mentalHealthService.handleUserMessage(conversationId, email, userMessage);
         return ResponseEntity.ok(response);
     }
 }

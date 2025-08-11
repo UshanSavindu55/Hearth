@@ -2,14 +2,10 @@ package com.hearth.backend.service;
 
 import com.cohere.api.Cohere;
 import com.cohere.api.requests.ChatRequest;
-import com.cohere.api.types.ChatMessage;
-import com.cohere.api.types.Message;
 import com.cohere.api.types.NonStreamedChatResponse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CohereService {

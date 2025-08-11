@@ -25,20 +25,20 @@ public class MentalHealthService {
     //Handling the user prompt with the relevant business logics
     public ChatResponse handleUserMessage(Long conversationId, String email, String userMessage){
         Long convId = chatService.getOrCreateConversation(conversationId, email);
-        chatService.saveMessage(convId, userMessage, Message.Sender.USER);
         double relevancy_score = relevancyDetectionService.checkRelevancyScore(userMessage);
         String botResponse;
         if(relevancy_score > 0.5){
             List<Emotion> emotions = emotionDetectionService.detectEmotion(userMessage);
-            botResponse = chatService.processUserMessageAndSaveResponse(conversationId, userMessage, emotions);
+            chatService.saveMessage(convId, userMessage, Message.Sender.USER);
+            botResponse = chatService.processUserMessageAndSaveResponse(convId, userMessage, emotions);
         }
         else if(relevancy_score >= 0.4){
             botResponse = "I’m here to listen. Could you share a bit more about how this situation makes you feel?";
-            chatService.saveMessage(conversationId, botResponse, Message.Sender.BOT);
+            chatService.saveMessage(convId, botResponse, Message.Sender.BOT);
         }
         else {
             botResponse = "It’s important to talk about what’s on your mind. Could you please ask a question related to your mental health?";
-            chatService.saveMessage(conversationId, botResponse, Message.Sender.BOT);
+            chatService.saveMessage(convId, botResponse, Message.Sender.BOT);
         }
 
         return new ChatResponse(botResponse);

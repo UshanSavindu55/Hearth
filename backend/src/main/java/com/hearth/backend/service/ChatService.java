@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,9 +38,22 @@ public class ChatService {
         return sb.toString();
     }
 
-    public String processUserMessage(String message, List<Emotion> emotions) {
+    public String processUserMessage(Long conversationId, String message, List<Emotion> emotions) {
+        List<Message> recentMessages = messageRepository.findTop4ByConversation_ConversationIdOrderByTimestampDesc(conversationId);
+        Collections.reverse(recentMessages);
+
+        StringBuilder chatHistory = new StringBuilder();
+        for (Message m : recentMessages) {
+            chatHistory.append(m.getSender().name())
+                    .append(": ")
+                    .append(m.getContent())
+                    .append("\n");
+        }
+
         String emotionContext = emotionPromptCreator(emotions);
+
         String fullPrompt = "You are a compassionate mental health counselor. " +
+                "Conversation so far:\n" + chatHistory.toString() + "\n" +
                 "Based on the user's emotions: " + emotionContext + ", " +
                 "respond empathetically and thoughtfully to the user's message: \"" + message + "\". " +
                 "Provide support and understanding without referring to the emotion data explicitly.";
@@ -67,7 +81,7 @@ public class ChatService {
     }
 
     public String processUserMessageAndSaveResponse(Long conversationId, String userMessage, List<Emotion> emotions) {
-        String botResponse = processUserMessage(userMessage, emotions);
+        String botResponse = processUserMessage(conversationId, userMessage, emotions);
         saveMessage(conversationId, botResponse, Message.Sender.BOT);
         return botResponse;
     }

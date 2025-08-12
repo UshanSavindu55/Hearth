@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react'
+import Label from './Label'
 
 const Textarea = forwardRef(({ 
   label, 
@@ -9,6 +10,8 @@ const Textarea = forwardRef(({
   className = '',
   rows = 3,
   helperText,
+  labelVariant = 'default',
+  labelSize = 'md',
   ...props 
 }, ref) => {
   const textareaClasses = `
@@ -23,9 +26,15 @@ const Textarea = forwardRef(({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
+        <Label 
+          variant={error ? 'error' : labelVariant}
+          size={labelSize}
+          required={required}
+          disabled={disabled}
+          className="mb-1"
+        >
+          {label}
+        </Label>
       )}
       <textarea
         ref={ref}

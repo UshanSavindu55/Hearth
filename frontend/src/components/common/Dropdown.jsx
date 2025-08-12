@@ -1,4 +1,5 @@
 import React from 'react'
+import Label from './Label'
 
 const Dropdown = ({ 
   label, 
@@ -10,7 +11,9 @@ const Dropdown = ({
   disabled = false,
   required = false,
   className = '',
-  helperText
+  helperText,
+  labelVariant = 'default',
+  labelSize = 'md'
 }) => {
   const selectClasses = `
     w-full px-3 py-2 border rounded-lg text-gray-900 bg-white
@@ -23,9 +26,15 @@ const Dropdown = ({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
+        <Label 
+          variant={error ? 'error' : labelVariant}
+          size={labelSize}
+          required={required}
+          disabled={disabled}
+          className="mb-1"
+        >
+          {label}
+        </Label>
       )}
       <select
         value={value}

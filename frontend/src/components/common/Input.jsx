@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react'
+import Label from './Label'
 
 const Input = forwardRef(({ 
   label, 
@@ -10,6 +11,8 @@ const Input = forwardRef(({
   className = '',
   icon,
   helperText,
+  labelVariant = 'default',
+  labelSize = 'md',
   ...props 
 }, ref) => {
   const inputClasses = `
@@ -24,9 +27,15 @@ const Input = forwardRef(({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
+        <Label 
+          variant={error ? 'error' : labelVariant}
+          size={labelSize}
+          required={required}
+          disabled={disabled}
+          className="mb-1"
+        >
+          {label}
+        </Label>
       )}
       <div className="relative">
         {icon && (

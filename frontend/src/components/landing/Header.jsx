@@ -6,24 +6,24 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
-    <header className="bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-6 py-4">
+    <header className="bg-slate-900 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+      <div className="max-w-8xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <img src={logo} alt="Hearth Logo" className="w-10 h-10 rounded-xl" />
-            <span className="text-2xl font-bold text-gray-800">Hearth</span>
+            <span className="text-2xl font-bold text-white">Hearth</span>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+            <a href="#features" className="text-indigo-200 hover:text-indigo-500 transition-colors font-medium">
               Features
             </a>
-            <a href="#about" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+            <a href="#about" className="text-indigo-200 hover:text-indigo-500 transition-colors font-medium">
               About
             </a>
-            <a href="#contact" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+            <a href="#contact" className="text-indigo-200 hover:text-indigo-500 transition-colors font-medium">
               Contact
             </a>
             <Button variant="primary" size="md">

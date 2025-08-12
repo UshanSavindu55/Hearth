@@ -8,6 +8,7 @@ const Card = ({
   rounded = 'lg',
   border = true,
   hover = false,
+  bgColor = 'bg-white',
   ...props 
 }) => {
   const paddingClasses = {
@@ -39,7 +40,7 @@ const Card = ({
   const hoverClass = hover ? 'hover:shadow-lg transition-shadow duration-200' : ''
   
   const classes = `
-    bg-white
+    ${bgColor}
     ${paddingClasses[padding]}
     ${shadowClasses[shadow]}
     ${roundedClasses[rounded]}

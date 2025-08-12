@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Input, Card, Label } from '../components/common'
+import { MdEmail, MdLock } from 'react-icons/md'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import logo from '../assets/logo.png'
 
 const Login = () => {
@@ -8,6 +10,7 @@ const Login = () => {
     email: '',
     password: ''
   })
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleChange = (e) => {
     setFormData({
@@ -54,6 +57,7 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
+                leftIcon={<MdEmail className="w-5 h-5" />}
                 className="bg-white text-slate-700 placeholder-slate-400 focus:border-slate-800 focus:ring-2 focus:ring-indigo-400/40 transition-all duration-200 backdrop-blur-sm"
               />
             </div>
@@ -66,11 +70,21 @@ const Login = () => {
               <Input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
+                leftIcon={<MdLock className="w-5 h-5" />}
+                rightIcon={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                  >
+                    {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
+                  </button>
+                }
                 className="bg-white text-slate-700 placeholder-slate-400 focus:border-slate-800 focus:ring-2 focus:ring-indigo-400/40 transition-all duration-200 backdrop-blur-sm"
               />
             </div>

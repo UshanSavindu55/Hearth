@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Button, IconButton } from '../common'
 import logo from '../../assets/logo.png'
 
@@ -26,9 +27,18 @@ const Header = () => {
             <a href="#contact" className="text-indigo-200 hover:text-indigo-500 transition-colors font-medium">
               Contact
             </a>
-            <Button variant="primary" size="md">
-              Get Started
-            </Button>
+            <div className="flex items-center space-x-4">
+              <Link to="/login">
+                <Button variant="ghost" size="md" className="text-indigo-200 hover:text-white">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button variant="primary" size="md">
+                  Get Started
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -46,20 +56,29 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 py-4 border-t border-gray-200">
+          <div className="md:hidden mt-4 py-4 border-t border-slate-700">
             <div className="flex flex-col space-y-4">
-              <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+              <a href="#features" className="text-indigo-200 hover:text-indigo-500 transition-colors font-medium">
                 Features
               </a>
-              <a href="#about" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+              <a href="#about" className="text-indigo-200 hover:text-indigo-500 transition-colors font-medium">
                 About
               </a>
-              <a href="#contact" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">
+              <a href="#contact" className="text-indigo-200 hover:text-indigo-500 transition-colors font-medium">
                 Contact
               </a>
-              <Button variant="primary" size="md" fullWidth>
-                Get Started
-              </Button>
+              <div className="flex flex-col space-y-3 pt-4">
+                <Link to="/login">
+                  <Button variant="ghost" size="md" fullWidth className="text-indigo-200 hover:text-white">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button variant="primary" size="md" fullWidth>
+                    Get Started
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         )}

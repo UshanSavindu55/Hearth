@@ -9,18 +9,25 @@ const Input = forwardRef(({
   disabled = false,
   required = false,
   className = '',
-  icon,
+  leftIcon,
+  rightIcon,
+  icon, // backward compatibility - defaults to left
   helperText,
   labelVariant = 'default',
   labelSize = 'md',
   ...props 
 }, ref) => {
+  // Handle backward compatibility with single icon prop
+  const displayLeftIcon = leftIcon || icon
+  const displayRightIcon = rightIcon
+
   const inputClasses = `
-    w-full px-3 py-2 border rounded-lg text-gray-900 placeholder-gray-500 
+    w-full py-2 border rounded-lg text-gray-900 placeholder-gray-500 
     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
     disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100
     ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'}
-    ${icon ? 'pl-10' : ''}
+    ${displayLeftIcon ? 'pl-10' : 'pl-3'}
+    ${displayRightIcon ? 'pr-10' : 'pr-3'}
     ${className}
   `
   
@@ -38,11 +45,14 @@ const Input = forwardRef(({
         </Label>
       )}
       <div className="relative">
-        {icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-            {icon}
+        {/* Left Icon */}
+        {displayLeftIcon && (
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 z-10">
+            {displayLeftIcon}
           </div>
         )}
+        
+        {/* Input Field */}
         <input
           ref={ref}
           type={type}
@@ -51,6 +61,13 @@ const Input = forwardRef(({
           className={inputClasses.trim()}
           {...props}
         />
+        
+        {/* Right Icon */}
+        {displayRightIcon && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 z-10">
+            {displayRightIcon}
+          </div>
+        )}
       </div>
       {error && (
         <p className="mt-1 text-sm text-red-600">{error}</p>

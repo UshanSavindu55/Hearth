@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { Button, Card } from '../common'
 
 const CTA = () => {
@@ -17,13 +18,15 @@ const CTA = () => {
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
             Join thousands who have found support and healing through Hearth's compassionate AI companion.
           </p>
-          <Button 
-            variant="primary"
-            size="xl"
-            bgcolor="bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-105 shadow-lg"
-          >
-            Start Your Free Chat
-          </Button>
+          <Link to="/signup">
+            <Button 
+              variant="primary"
+              size="xl"
+              bgcolor="bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-105 shadow-lg"
+            >
+              Start Your Free Chat
+            </Button>
+          </Link>
         </Card>
       </div>
     </section>

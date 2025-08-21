@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Button, Input, Card, Label } from '../components/common'
 import { MdEmail, MdLock } from 'react-icons/md'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
-import { authAPI } from '../utils/api'
+import { authAPI } from '../api'
 import logo from '../assets/logo.png'
 
 const Login = () => {

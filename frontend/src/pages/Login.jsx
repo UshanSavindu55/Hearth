@@ -36,17 +36,24 @@ const Login = () => {
       })
 
       // Handle successful login
-      if (response.token) {
+      if (response.action === 'login' && response.data && response.data.token) {
         // Store the token in localStorage
-        localStorage.setItem('authToken', response.token)
+        localStorage.setItem('authToken', response.data.token)
         
-        // Store user data if provided
-        if (response.user) {
-          localStorage.setItem('user', JSON.stringify(response.user))
+        // Store user data if provided, otherwise create basic user object
+        if (response.data.user) {
+          localStorage.setItem('user', JSON.stringify(response.data.user))
+        } else {
+          // Create basic user object from form data since backend doesn't return user details
+          const basicUser = {
+            email: formData.email,
+            username: formData.email.split('@')[0] // Extract username from email
+          }
+          localStorage.setItem('user', JSON.stringify(basicUser))
         }
 
-        // Navigate to dashboard or home page
-        navigate('/dashboard') // Change this to your desired route
+        // Navigate to dashboard
+        navigate('/dashboard')
       }
 
     } catch (error) {
@@ -78,7 +85,7 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Error Message */}
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <div className="bg-red-50 border-b border-red-500 text-red-600 px-4 py-3" role="alert">
                 <span className="block sm:inline">{error}</span>
               </div>
             )}
@@ -158,7 +165,7 @@ const Login = () => {
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                {loading ? 'Signing In...' : 'Sign In'}
+                {loading ? 'Signing In...' : 'Log In'}
               </Button>
             </div>
           </form>

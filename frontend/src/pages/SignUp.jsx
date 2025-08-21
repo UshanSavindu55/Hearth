@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Button, Input, Card, Label } from '../components/common'
+import { Button, Input, Card, Label, SuccessModal } from '../components/common'
 import { FaUser, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { MdEmail, MdLock } from 'react-icons/md'
 import { authAPI } from '../api'
+import { validateSignupForm, hasValidationErrors } from '../utils/validation'
 import logo from '../assets/logo.png'
 
 const SignUp = () => {
@@ -11,14 +12,19 @@ const SignUp = () => {
     username: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    agreeToTerms: false
+    confirmPassword: ''
   })
 
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [successData, setSuccessData] = useState({
+    title: '',
+    message: '',
+    action: ''
+  })
   const navigate = useNavigate()
 
   const handleChange = (e) => {
@@ -28,7 +34,7 @@ const SignUp = () => {
       [name]: type === 'checkbox' ? checked : value
     })
 
-    // Clear specific error when user starts typing
+    // Clearing specific error when user starts typing
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -37,51 +43,11 @@ const SignUp = () => {
     }
   }
 
-  const validateForm = () => {
-    const newErrors = {}
-
-    // Username validation
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username is required'
-    } else if (formData.username.trim().length < 3) {
-      newErrors.username = 'Username must be at least 3 characters'
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!formData.email) {
-      newErrors.email = 'Email is required'
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
-    }
-
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = 'Password is required'
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters long'
-    }
-
-    // Confirm password validation
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password'
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
-    }
-
-    // Terms agreement validation
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = 'You must agree to the terms and conditions'
-    }
-
-    return newErrors
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    const validationErrors = validateForm()
-    if (Object.keys(validationErrors).length > 0) {
+    const validationErrors = validateSignupForm(formData)
+    if (hasValidationErrors(validationErrors)) {
       setErrors(validationErrors)
       return
     }
@@ -90,27 +56,28 @@ const SignUp = () => {
     setErrors({})
 
     try {
-      // Call the register API
+      // Calling the register API
       const response = await authAPI.register({
         username: formData.username,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
       })
 
       // Handle successful registration
-      if (response.token) {
-        // Store the token in localStorage
-        localStorage.setItem('authToken', response.token)
-        
-        // Store user data if provided
-        if (response.user) {
-          localStorage.setItem('user', JSON.stringify(response.user))
-        }
-
-        // Navigate to dashboard or show success message
-        navigate('/dashboard') // Change this to your desired route
+      if (response.action === 'signup' && response.message) {
+        // Store backend response data
+        console.log('Backend response:', response)
+        setSuccessData({
+          title: 'Registration Successful!',
+          message: response.message,
+          action: response.action
+        })
+        // Show success modal
+        setShowSuccessModal(true)
       } else {
-        // If no token, redirect to login page
+        // Unexpected response format
+        setErrors({ general: 'Registration completed but received unexpected response.' })
         navigate('/login')
       }
 
@@ -127,6 +94,12 @@ const SignUp = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSuccessModalClose = () => {
+    console.log('Closing success modal')
+    setShowSuccessModal(false)
+    navigate('/login')
   }
 
   return (
@@ -146,10 +119,23 @@ const SignUp = () => {
 
         {/* Sign Up Form */}
         <Card rounded='2xl' className="p-10 bgColor-slate-800 backdrop-blur-xl border border-slate-700/50 shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {showSuccessModal ? (
+            /* Success Message Component */
+            <SuccessModal
+              isOpen={showSuccessModal}
+              onClose={handleSuccessModalClose}
+              title={successData.title}
+              subtitle="Welcome to Hearth!"
+              message={`${successData.message} You can now sign in with your credentials to start your journey.`}
+              buttonText="Continue to Login"
+              buttonAction={handleSuccessModalClose}
+            />
+          ) : (
+            /* Signup Form */
+            <form onSubmit={handleSubmit} className="space-y-6">
             {/* General Error Message */}
             {errors.general && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <div className="bg-red-50 border-b border-red-500 text-red-600 px-4 py-3" role="alert">
                 <span className="block sm:inline">{errors.general}</span>
               </div>
             )}
@@ -208,7 +194,7 @@ const SignUp = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Create a strong password"
+                placeholder="Enter Your Password"
                 leftIcon={<MdLock className="w-5 h-5" />}
                 rightIcon={
                   <button
@@ -224,7 +210,7 @@ const SignUp = () => {
               {errors.password && (
                 <p className="text-red-400 text-xs mt-1">{errors.password}</p>
               )}
-              <p className="text-slate-500 text-xs mt-1">Must be at least 8 characters long</p>
+              <p className="text-slate-500 text-xs mt-1">Must be at least 6 characters long</p>
             </div>
 
             {/* Confirm Password Field */}
@@ -257,46 +243,21 @@ const SignUp = () => {
               )}
             </div>
 
-            {/* Terms Agreement */}
-            <div className="flex items-start pt-2">
-              <input
-                id="agreeToTerms"
-                name="agreeToTerms"
-                type="checkbox"
-                checked={formData.agreeToTerms}
-                onChange={handleChange}
-                className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-slate-800 border-slate-600 bg-slate-700/50 rounded transition-colors mt-1"
-              />
-              <div className="ml-3">
-                <Label htmlFor="agreeToTerms" variant="other" className="text-sm">
-                  I agree to the{' '}
-                  <a href="#" className="text-indigo-500 hover:text-indigo-300 underline">
-                    Terms of Service
-                  </a>{' '}
-                  and{' '}
-                  <a href="#" className="text-indigo-500 hover:text-indigo-300 underline">
-                    Privacy Policy
-                  </a>
-                </Label>
-                {errors.agreeToTerms && (
-                  <p className="text-red-400 text-xs mt-1">{errors.agreeToTerms}</p>
-                )}
-              </div>
-            </div>
-
             {/* Submit Button */}
             <div className="pt-4">
               <Button 
                 type="submit"
                 variant="primary"
                 size="lg"
-                disabled={loading || !formData.agreeToTerms}
+                disabled={loading}
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {loading ? 'Creating Account...' : 'Create Account'}
               </Button>
+              
             </div>
           </form>
+          )}
         </Card>
 
         {/* Sign In Link */}

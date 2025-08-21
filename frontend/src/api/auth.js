@@ -1,4 +1,4 @@
-// Authentication API functions
+
 import { apiRequest } from './index'
 
 export const authAPI = {
@@ -12,7 +12,7 @@ export const authAPI = {
 
   // Register user
   register: async (userData) => {
-    return apiRequest('/auth/register', {
+    return apiRequest('/auth/signup', {
       method: 'POST',
       body: JSON.stringify(userData),
     })

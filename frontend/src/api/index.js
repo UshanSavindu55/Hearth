@@ -1,6 +1,5 @@
-// Main API configuration and shared functions
-// API base URL - adjust this to match your backend
-const API_BASE_URL = 'http://localhost:8080/api'
+// API base URL - using relative path for proxy
+const API_BASE_URL = '/api'
 
 // Generic API request function
 export const apiRequest = async (endpoint, options = {}) => {
@@ -14,7 +13,7 @@ export const apiRequest = async (endpoint, options = {}) => {
     ...options,
   }
 
-  // Add authorization token if available
+  // Adding authorization token if available
   const token = localStorage.getItem('authToken')
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`
@@ -23,13 +22,13 @@ export const apiRequest = async (endpoint, options = {}) => {
   try {
     const response = await fetch(url, config)
     
-    // Handle different response types
+    // Handling different response types
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
     }
 
-    // Return JSON if response has content
+    // Returning JSON if response has content
     const contentType = response.headers.get('content-type')
     if (contentType && contentType.includes('application/json')) {
       return await response.json()
@@ -56,7 +55,7 @@ export const api = {
   delete: (endpoint) => apiRequest(endpoint, { method: 'DELETE' }),
 }
 
-// Export all API modules
+// Exporting all API modules
 export { authAPI } from './auth'
 export { chatAPI } from './chat'
 

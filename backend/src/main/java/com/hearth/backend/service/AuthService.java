@@ -2,12 +2,14 @@ package com.hearth.backend.service;
 
 import com.hearth.backend.dto.LogInRequest;
 import com.hearth.backend.dto.SignUpRequest;
+import com.hearth.backend.dto.SuccessResponse;
 import com.hearth.backend.security.JwtService;
 import com.hearth.backend.exception.EmailAlreadyUsedException;
 import com.hearth.backend.exception.PasswordMismatchException;
 import com.hearth.backend.model.User;
 import com.hearth.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,7 +49,13 @@ public class AuthService {
         user.setEmail(signupRequest.getEmail());
         user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
         userRepository.save(user);
-        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+        
+        SuccessResponse response = new SuccessResponse(
+            "signup",
+            "User registered successfully",
+            HttpStatus.OK.value()
+        );
+        return ResponseEntity.ok(response);
     }
 
     public ResponseEntity<?> login(LogInRequest request) {
@@ -60,10 +68,13 @@ public class AuthService {
 
         String token = jwtService.generateToken(userDetails.getUsername());
 
-        return ResponseEntity.ok(Map.of(
-                "message", "User authenticated successfully",
-                "token", token
-        ));
+        SuccessResponse response = new SuccessResponse(
+            "login",
+            "User authenticated successfully",
+            HttpStatus.OK.value(),
+            Map.of("token", token)
+        );
+        return ResponseEntity.ok(response);
     }
 }
 

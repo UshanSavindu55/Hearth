@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Header, ChatBubble, ChatInput, LoadingDots } from '../components/common';
+import { Header, ChatBubble, ChatInput, LoadingDots, ConversationList } from '../components/common';
 
 // Main Dashboard Component
 const MentalHealthChatbot = () => {
   const [user, setUser] = useState(null);
+  const [currentConversationId, setCurrentConversationId] = useState(null);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -75,6 +76,34 @@ const MentalHealthChatbot = () => {
     }, 1500);
   };
 
+  // Handle selecting a conversation
+  const handleSelectConversation = (conversation) => {
+    setCurrentConversationId(conversation.id);
+    // In a real app, you would load the messages for this conversation
+    // For now, we'll just show a placeholder message
+    setMessages([
+      {
+        id: 1,
+        text: `Loading conversation: "${conversation.title}"`,
+        sender: 'bot',
+        timestamp: new Date()
+      }
+    ]);
+  };
+
+  // Handle creating a new conversation
+  const handleNewConversation = () => {
+    setCurrentConversationId(null);
+    setMessages([
+      {
+        id: 1,
+        text: "Hello! I'm here to listen and support you. How are you feeling today?",
+        sender: 'bot',
+        timestamp: new Date()
+      }
+    ]);
+  };
+
   // Show loading screen while checking authentication
   if (!user) {
     return (
@@ -89,27 +118,43 @@ const MentalHealthChatbot = () => {
       {/* Header */}
       <Header user={user} />
       
-      {/* Chat Container */}
-      <div className="flex-1 p-4">
-        <div className="max-w-4xl mx-auto bg-slate-800 rounded-lg border border-slate-700 h-full flex flex-col">
-          
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {messages.map((message) => (
-              <ChatBubble key={message.id} message={message} />
-            ))}
+      {/* Main Content with Sidebar */}
+      <div className="flex-1 flex">
+        
+        {/* Chat Container */}
+        <div className="flex-1 p-6">
+          <div className="h-full bg-slate-800 rounded-xl flex flex-col">
             
-            {isLoading && <LoadingDots />}
-            
-            <div ref={messagesEndRef} />
-          </div>
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {messages.map((message) => (
+                <ChatBubble key={message.id} message={message} />
+              ))}
+              
+              {isLoading && <LoadingDots />}
+              
+              <div ref={messagesEndRef} />
+            </div>
 
-          {/* Input Area */}
-          <ChatInput 
-            onSend={handleSendMessage}
-            disabled={isLoading}
+            {/* Input Area */}
+            <div className="p-6 pt-0">
+              <ChatInput 
+                onSend={handleSendMessage}
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Conversation List Sidebar */}
+        <div className="w-72">
+          <ConversationList 
+            onSelectConversation={handleSelectConversation}
+            currentConversationId={currentConversationId}
+            onNewConversation={handleNewConversation}
           />
         </div>
+
       </div>
     </div>
   );

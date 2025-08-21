@@ -19,8 +19,8 @@ const ChatInput = ({ onSend, disabled }) => {
   };
 
   return (
-    <div className="border-t border-slate-700 bg-slate-800 p-3">
-      <div className="flex space-x-2">
+    <div className="border-t border-slate-700 bg-slate-800 p-4">
+      <div className="flex space-x-3">
         <input
           type="text"
           value={input}
@@ -28,12 +28,12 @@ const ChatInput = ({ onSend, disabled }) => {
           onKeyPress={handleKeyPress}
           placeholder="Type your message here..."
           disabled={disabled}
-          className="flex-1 px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-4 py-2 border border-slate-600 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
         />
         <button
           onClick={handleSend}
           disabled={disabled || !input.trim()}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <IoSend className="w-4 h-4" />
         </button>

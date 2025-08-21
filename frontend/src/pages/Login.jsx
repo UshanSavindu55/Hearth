@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button, Input, Card, Label } from '../components/common'
 import { MdEmail, MdLock } from 'react-icons/md'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { authAPI } from '../utils/api'
 import logo from '../assets/logo.png'
 
 const Login = () => {
@@ -11,6 +12,9 @@ const Login = () => {
     password: ''
   })
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     setFormData({
@@ -19,11 +23,39 @@ const Login = () => {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: Implement actual login logic here
-    console.log('Login attempt:', formData)
-    // This would typically call an API endpoint
+    setError('')
+    setLoading(true)
+
+    try {
+      // Call the login API
+      const response = await authAPI.login({
+        email: formData.email,
+        password: formData.password
+      })
+
+      // Handle successful login
+      if (response.token) {
+        // Store the token in localStorage
+        localStorage.setItem('authToken', response.token)
+        
+        // Store user data if provided
+        if (response.user) {
+          localStorage.setItem('user', JSON.stringify(response.user))
+        }
+
+        // Navigate to dashboard or home page
+        navigate('/dashboard') // Change this to your desired route
+      }
+
+    } catch (error) {
+      // Handle login errors
+      setError(error.message || 'Login failed. Please try again.')
+      console.error('Login error:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -44,6 +76,13 @@ const Login = () => {
         {/* Login Form */}
         <Card rounded = '2xl' className="p-10 bgColor-slate-800 backdrop-blur-xl border border-slate-700/50 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span className="block sm:inline">{error}</span>
+              </div>
+            )}
+
             {/* Email Field */}
             <div className="space-y-2">
               <Label htmlFor="email">
@@ -116,9 +155,10 @@ const Login = () => {
                 type="submit"
                 variant="primary"
                 size="lg"
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Sign In
+                {loading ? 'Signing In...' : 'Sign In'}
               </Button>
             </div>
           </form>

@@ -1,7 +1,6 @@
 package com.hearth.backend.config;
 
 import com.hearth.backend.security.JwtAuthenticationFilter;
-import com.hearth.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,9 +19,6 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;

@@ -2,9 +2,6 @@ package com.hearth.backend.controller;
 
 import com.hearth.backend.dto.ChatRequest;
 import com.hearth.backend.dto.ChatResponse;
-
-import com.hearth.backend.service.ChatService;
-import com.hearth.backend.service.EmotionDetectionService;
 import com.hearth.backend.service.MentalHealthService;
 
 import jakarta.validation.Valid;
@@ -18,12 +15,6 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
-
-    @Autowired
-    private ChatService chatService;
-
-    @Autowired
-    private EmotionDetectionService emotionDetectionService;
 
     @Autowired
     MentalHealthService mentalHealthService;

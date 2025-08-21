@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button, Input, Card, Label } from '../components/common'
 import { FaUser, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { MdEmail, MdLock } from 'react-icons/md'
+import { authAPI } from '../utils/api'
 import logo from '../assets/logo.png'
 
 const SignUp = () => {
@@ -17,6 +18,8 @@ const SignUp = () => {
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target
@@ -74,7 +77,7 @@ const SignUp = () => {
     return newErrors
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     
     const validationErrors = validateForm()
@@ -83,10 +86,47 @@ const SignUp = () => {
       return
     }
 
-    // TODO: Implement actual signup logic here
-    console.log('Sign up attempt:', formData)
-    // This would typically call an API endpoint
+    setLoading(true)
     setErrors({})
+
+    try {
+      // Call the register API
+      const response = await authAPI.register({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      })
+
+      // Handle successful registration
+      if (response.token) {
+        // Store the token in localStorage
+        localStorage.setItem('authToken', response.token)
+        
+        // Store user data if provided
+        if (response.user) {
+          localStorage.setItem('user', JSON.stringify(response.user))
+        }
+
+        // Navigate to dashboard or show success message
+        navigate('/dashboard') // Change this to your desired route
+      } else {
+        // If no token, redirect to login page
+        navigate('/login')
+      }
+
+    } catch (error) {
+      // Handle registration errors
+      if (error.message.includes('email')) {
+        setErrors({ email: 'Email is already in use' })
+      } else if (error.message.includes('username')) {
+        setErrors({ username: 'Username is already taken' })
+      } else {
+        setErrors({ general: error.message || 'Registration failed. Please try again.' })
+      }
+      console.error('Registration error:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -107,6 +147,13 @@ const SignUp = () => {
         {/* Sign Up Form */}
         <Card rounded='2xl' className="p-10 bgColor-slate-800 backdrop-blur-xl border border-slate-700/50 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* General Error Message */}
+            {errors.general && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span className="block sm:inline">{errors.general}</span>
+              </div>
+            )}
+
             {/* Username Field */}
             <div className="space-y-2">
               <Label htmlFor="username">
@@ -243,9 +290,10 @@ const SignUp = () => {
                 type="submit"
                 variant="primary"
                 size="lg"
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl"
+                disabled={loading || !formData.agreeToTerms}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Create Account
+                {loading ? 'Creating Account...' : 'Create Account'}
               </Button>
             </div>
           </form>

@@ -103,7 +103,7 @@ public class ChatService {
         Conversation conversation = new Conversation();
         conversation.setUser(user);
         conversation.setStartedAt(LocalDateTime.now());
-        conversation.setTitle("Conversation started at " + LocalDateTime.now());
+        conversation.setTitle("New Conversation"); // Temporary title
         conversationRepo.save(conversation);
         return conversation.getConversationId();
     }
@@ -112,6 +112,64 @@ public class ChatService {
         return conversationRepo.findById(conversationId)
                 .map(c -> c.getUser().getEmail().equals(email))
                 .orElse(false);
+    }
+    
+    public List<Conversation> getUserConversations(String email) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
+        return conversationRepo.findByUserOrderByStartedAtDesc(user);
+    }
+    
+    public List<Message> getConversationMessages(Long conversationId, String email) {
+        if (!isConversationBelongsToUser(conversationId, email)) {
+            throw new IllegalArgumentException("Conversation does not belong to user");
+        }
+        return messageRepository.findByConversationConversationIdOrderByTimestampAsc(conversationId);
+    }
+    
+    public void updateConversationTitle(Long conversationId, String userMessage) {
+        Optional<Conversation> conversationOpt = conversationRepo.findById(conversationId);
+        if (conversationOpt.isPresent()) {
+            Conversation conversation = conversationOpt.get();
+            
+            // Only update if it's still the default title
+            if ("New Conversation".equals(conversation.getTitle())) {
+                String title = generateTitleFromMessage(userMessage);
+                conversation.setTitle(title);
+                conversationRepo.save(conversation);
+            }
+        }
+    }
+    
+    private String generateTitleFromMessage(String message) {
+        // Clean and truncate the message for the title
+        String cleaned = message.trim();
+        
+        // Remove common starting phrases
+        cleaned = cleaned.replaceAll("(?i)^(I am |I'm |I feel |I think |I have |I want |I need |I don't |I can't |I was |I will |I would )", "");
+        
+        // Truncate to reasonable length
+        if (cleaned.length() > 30) {
+            cleaned = cleaned.substring(0, 30).trim();
+            // Try to break at word boundary
+            int lastSpace = cleaned.lastIndexOf(' ');
+            if (lastSpace > 15) {
+                cleaned = cleaned.substring(0, lastSpace);
+            }
+            cleaned += "...";
+        }
+        
+        // Capitalize first letter
+        if (!cleaned.isEmpty()) {
+            cleaned = cleaned.substring(0, 1).toUpperCase() + cleaned.substring(1);
+        }
+        
+        // Fallback if cleaning resulted in empty string
+        if (cleaned.isEmpty() || cleaned.length() < 3) {
+            return "Mental Health Chat";
+        }
+        
+        return cleaned;
     }
 
 }

@@ -25,11 +25,17 @@ public class MentalHealthService {
     //Handling the user prompt with the relevant business logics
     public ChatResponse handleUserMessage(Long conversationId, String email, String userMessage){
         Long convId = chatService.getOrCreateConversation(conversationId, email);
+        
+        // Always save the user message first
+        chatService.saveMessage(convId, userMessage, Message.Sender.USER);
+        
+        // Update conversation title if this is a new conversation
+        chatService.updateConversationTitle(convId, userMessage);
+        
         double relevancy_score = relevancyDetectionService.checkRelevancyScore(userMessage);
         String botResponse;
         if(relevancy_score > 0.5){
             List<Emotion> emotions = emotionDetectionService.detectEmotion(userMessage);
-            chatService.saveMessage(convId, userMessage, Message.Sender.USER);
             botResponse = chatService.processUserMessageAndSaveResponse(convId, userMessage, emotions);
         }
         else if(relevancy_score >= 0.4){
@@ -41,7 +47,7 @@ public class MentalHealthService {
             chatService.saveMessage(convId, botResponse, Message.Sender.BOT);
         }
 
-        return new ChatResponse(botResponse);
+        return new ChatResponse(botResponse, convId);
     }
 
 

@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import { publicRoutes, privateRoutes, devRoutes, specialRoutes } from './routeConfig'
+import { publicRoutes, privateRoutes, specialRoutes } from './routeConfig'
 import ProtectedRoute from './ProtectedRoute'
 import PublicRoute from './PublicRoute'
 import LoadingSpinner from '../components/common/Loading'
@@ -49,17 +49,6 @@ const AppRoutes = () => {
         )
       })}
 
-      {/* Development Routes (only in development) */}
-      {import.meta.env.DEV && devRoutes.map((route) => {
-        const Component = route.element
-        return (
-          <Route
-            key={route.path}
-            path={route.path}
-            element={<Component />}
-          />
-        )
-      })}
 
       {/* Special Routes (404, etc.) */}
       {specialRoutes.map((route) => {

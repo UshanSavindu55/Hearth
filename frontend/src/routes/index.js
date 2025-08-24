@@ -1,9 +1,9 @@
-import { publicRoutes, privateRoutes, devRoutes, specialRoutes, allRoutes } from './routeConfig'
+import { publicRoutes, privateRoutes, specialRoutes, allRoutes } from './routeConfig'
 
 export { default as AppRoutes } from './AppRoutes'
 export { default as ProtectedRoute } from './ProtectedRoute'
 export { default as PublicRoute } from './PublicRoute'
-export { publicRoutes, privateRoutes, devRoutes, specialRoutes, allRoutes }
+export { publicRoutes, privateRoutes, specialRoutes, allRoutes }
 
 export const getRouteByName = (name) => {
   return allRoutes.find(route => route.name === name)

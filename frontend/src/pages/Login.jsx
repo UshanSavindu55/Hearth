@@ -7,10 +7,12 @@ import { authAPI } from '../api'
 import logo from '../assets/logo.png'
 
 const Login = () => {
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
+  
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')

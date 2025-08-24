@@ -1,43 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { FaComments, FaTrash, FaPlus, FaClock } from 'react-icons/fa';
+import { apiRequest } from '../../api';
 
 const ConversationList = ({ onSelectConversation, currentConversationId, onNewConversation }) => {
   const [conversations, setConversations] = useState([]);
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // Mock data for conversations - replace with actual API call
+  // Fetch conversations from API
   useEffect(() => {
-    const mockConversations = [
-      {
-        id: 1,
-        title: "Feeling anxious about work",
-        lastMessage: "Thank you for listening, I feel much better now.",
-        timestamp: new Date(Date.now() - 86400000), // 1 day ago
-        messageCount: 12
-      },
-      {
-        id: 2,
-        title: "Stress management",
-        lastMessage: "Those breathing exercises really helped.",
-        timestamp: new Date(Date.now() - 172800000), // 2 days ago
-        messageCount: 8
-      },
-      {
-        id: 3,
-        title: "Sleep troubles",
-        lastMessage: "I'll try the relaxation techniques you suggested.",
-        timestamp: new Date(Date.now() - 259200000), // 3 days ago
-        messageCount: 15
-      },
-      {
-        id: 4,
-        title: "Relationship concerns",
-        lastMessage: "That perspective makes a lot of sense.",
-        timestamp: new Date(Date.now() - 432000000), // 5 days ago
-        messageCount: 20
-      }
-    ];
-    setConversations(mockConversations);
+    fetchConversations();
+  }, []);
+
+  const fetchConversations = async () => {
+    try {
+      setLoading(true);
+      const response = await apiRequest('/chat/conversations', {
+        method: 'GET'
+      });
+      
+      // Transform the data to match our component's expected format
+      const transformedConversations = response.map(conv => ({
+        id: conv.conversationId,
+        title: conv.title,
+        lastMessage: "Click to view conversation", // We'd need to get this from messages
+        timestamp: new Date(conv.startedAt),
+        messageCount: conv.messageCount || 0
+      }));
+      
+      setConversations(transformedConversations);
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+      // Fallback to empty array on error
+      setConversations([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchConversations();
   }, []);
 
   const formatTimestamp = (date) => {

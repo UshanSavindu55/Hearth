@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header, ChatBubble, ChatInput, LoadingDots, ConversationList } from '../components/common';
+import { apiRequest } from '../api';
 
 // Main Dashboard Component
 const MentalHealthChatbot = () => {
@@ -54,41 +55,78 @@ const MentalHealthChatbot = () => {
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const responses = [
-        "Thank you for sharing that with me. Can you tell me more about how you're feeling?",
-        "I hear you. It's important to acknowledge these feelings. What would help you feel better right now?",
-        "That sounds challenging. You're brave for reaching out. What support do you need today?",
-        "I understand. Remember that it's okay to feel this way. What usually helps you when you feel like this?",
-        "Your feelings are valid. Let's work through this together. What's one small thing that might help right now?"
-      ];
-      
+    try {
+      // Send message to backend
+      const response = await apiRequest('/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+          message: messageText,
+          conversationId: currentConversationId
+        })
+      });
+
+      // Add bot response
       const botResponse = {
         id: Date.now() + 1,
-        text: responses[Math.floor(Math.random() * responses.length)],
+        text: response.reply,
         sender: 'bot',
         timestamp: new Date()
       };
       
+      // Update conversation ID if this is a new conversation
+      if (response.conversationId && !currentConversationId) {
+        setCurrentConversationId(response.conversationId);
+      }
+      
       setMessages(prev => [...prev, botResponse]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      // Fallback response on error
+      const errorResponse = {
+        id: Date.now() + 1,
+        text: "I'm sorry, I'm having trouble responding right now. Please try again.",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   // Handle selecting a conversation
-  const handleSelectConversation = (conversation) => {
-    setCurrentConversationId(conversation.id);
-    // In a real app, you would load the messages for this conversation
-    // For now, we'll just show a placeholder message
-    setMessages([
-      {
-        id: 1,
-        text: `Loading conversation: "${conversation.title}"`,
-        sender: 'bot',
-        timestamp: new Date()
-      }
-    ]);
+  const handleSelectConversation = async (conversationId) => {
+    setCurrentConversationId(conversationId);
+    setIsLoading(true);
+    
+    try {
+      // Load messages for this conversation
+      const response = await apiRequest(`/chat/conversations/${conversationId}/messages`);
+      
+      // Transform backend messages to frontend format
+      const formattedMessages = response.map(msg => ({
+        id: msg.id,
+        text: msg.content,
+        sender: msg.sender,
+        timestamp: new Date(msg.timestamp)
+      }));
+      
+      setMessages(formattedMessages);
+    } catch (error) {
+      console.error('Error loading conversation:', error);
+      setMessages([
+        {
+          id: 1,
+          text: "Sorry, I couldn't load this conversation. Please try again.",
+          sender: 'bot',
+          timestamp: new Date()
+        }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle creating a new conversation
@@ -114,30 +152,36 @@ const MentalHealthChatbot = () => {
   }
 
   return (
-    <div className="h-screen bg-slate-900 flex flex-col">
+    <div className="h-screen bg-slate-900 flex flex-col overflow-hidden">
       {/* Header */}
       <Header user={user} />
       
       {/* Main Content with Sidebar */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex overflow-hidden">
         
         {/* Chat Container */}
-        <div className="flex-1 p-6">
-          <div className="h-full bg-slate-800 rounded-xl flex flex-col">
+        <div className="flex-1 p-6 flex flex-col">
+          <div className="flex-1 bg-slate-800 rounded-xl flex flex-col overflow-hidden">
             
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6">
+            {/* Messages Area - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6" style={{scrollbarWidth: 'thin', scrollbarColor: '#64748b #334155'}}>
               {messages.map((message) => (
-                <ChatBubble key={message.id} message={message} />
+                <div key={message.id} className="mb-4">
+                  <ChatBubble message={message} />
+                </div>
               ))}
               
-              {isLoading && <LoadingDots />}
+              {isLoading && (
+                <div className="mb-4">
+                  <LoadingDots />
+                </div>
+              )}
               
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
-            <div className="p-6 pt-0">
+            {/* Input Area - Fixed at bottom */}
+            <div className="flex-shrink-0 p-6 pt-0 bg-slate-800">
               <ChatInput 
                 onSend={handleSendMessage}
                 disabled={isLoading}
@@ -147,7 +191,7 @@ const MentalHealthChatbot = () => {
         </div>
 
         {/* Conversation List Sidebar */}
-        <div className="w-72">
+        <div className="w-72 flex-shrink-0">
           <ConversationList 
             onSelectConversation={handleSelectConversation}
             currentConversationId={currentConversationId}

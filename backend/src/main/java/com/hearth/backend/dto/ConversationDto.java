@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatResponse {
-    private String reply;
+public class ConversationDto {
     private Long conversationId;
-
+    private String title;
+    private LocalDateTime startedAt;
+    private int messageCount;
 }

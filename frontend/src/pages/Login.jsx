@@ -1,16 +1,22 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button, Input, Card, Label } from '../components/common'
 import { MdEmail, MdLock } from 'react-icons/md'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { authAPI } from '../api'
 import logo from '../assets/logo.png'
 
 const Login = () => {
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
+  
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     setFormData({
@@ -19,11 +25,46 @@ const Login = () => {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: Implement actual login logic here
-    console.log('Login attempt:', formData)
-    // This would typically call an API endpoint
+    setError('')
+    setLoading(true)
+
+    try {
+      // Call the login API
+      const response = await authAPI.login({
+        email: formData.email,
+        password: formData.password
+      })
+
+      // Handle successful login
+      if (response.action === 'login' && response.data && response.data.token) {
+        // Store the token in localStorage
+        localStorage.setItem('authToken', response.data.token)
+        
+        // Store user data if provided, otherwise create basic user object
+        if (response.data.user) {
+          localStorage.setItem('user', JSON.stringify(response.data.user))
+        } else {
+          // Create basic user object from form data since backend doesn't return user details
+          const basicUser = {
+            email: formData.email,
+            username: formData.email.split('@')[0] // Extract username from email
+          }
+          localStorage.setItem('user', JSON.stringify(basicUser))
+        }
+
+        // Navigate to dashboard
+        navigate('/dashboard')
+      }
+
+    } catch (error) {
+      // Handle login errors
+      setError(error.message || 'Login failed. Please try again.')
+      console.error('Login error:', error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -44,6 +85,13 @@ const Login = () => {
         {/* Login Form */}
         <Card rounded = '2xl' className="p-10 bgColor-slate-800 backdrop-blur-xl border border-slate-700/50 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border-b border-red-500 text-red-600 px-4 py-3" role="alert">
+                <span className="block sm:inline">{error}</span>
+              </div>
+            )}
+
             {/* Email Field */}
             <div className="space-y-2">
               <Label htmlFor="email">
@@ -116,9 +164,10 @@ const Login = () => {
                 type="submit"
                 variant="primary"
                 size="lg"
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Sign In
+                {loading ? 'Signing In...' : 'Log In'}
               </Button>
             </div>
           </form>

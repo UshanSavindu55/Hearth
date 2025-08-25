@@ -39,13 +39,23 @@ const Header = ({ user }) => {
   };
 
   const getUserInitial = () => {
-    if (user?.username) {
-      return user.username.charAt(0).toUpperCase();
+    if (user?.name) {
+      return user.name.charAt(0).toUpperCase();
     }
     if (user?.email) {
       return user.email.charAt(0).toUpperCase();
     }
     return 'U';
+  };
+
+  const getUserDisplayName = () => {
+    if (user?.name) {
+      return user.name;
+    }
+    if (user?.email) {
+      return user.email.split('@')[0];
+    }
+    return 'User';
   };
 
   return (
@@ -75,7 +85,7 @@ const Header = ({ user }) => {
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
               <div className="px-4 py-2 border-b border-gray-100">
-                <p className="text-sm font-medium text-gray-900">{user?.username || 'User'}</p>
+                <p className="text-sm font-medium text-gray-900">{getUserDisplayName()}</p>
                 <p className="text-sm text-gray-500">{user?.email || 'user@example.com'}</p>
               </div>
               

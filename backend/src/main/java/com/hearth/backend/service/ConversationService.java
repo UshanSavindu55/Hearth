@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +26,9 @@ public class ConversationService {
     private final UserRepository userRepo;
     private final ConversationRepository conversationRepo;
     private final MessageRepository messageRepository;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
 
     /** Get existing conversation or create a new one with UUID */
     public UUID getOrCreateConversation(UUID conversationId, String email, String firstMessage) {
@@ -43,10 +48,15 @@ public class ConversationService {
         Conversation conversation = new Conversation();
         conversation.setUser(user);
         conversation.setStartedAt(LocalDateTime.now());
-        conversation.setTitle(generateTitleFromMessage(firstMessage)); // Set title from first message
+        conversation.setTitle(generateTitleFromMessage(firstMessage));
 
-        conversationRepo.save(conversation); // UUID is generated automatically
-        return conversation.getConversationId(); // returns UUID
+        try {
+            Conversation savedConversation = conversationRepo.save(conversation);
+            entityManager.flush();
+            return savedConversation.getConversationId();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save conversation", e);
+        }
     }
 
     /** Check if conversation belongs to user */
@@ -62,6 +72,7 @@ public class ConversationService {
         if (conversationOpt.isEmpty()) {
             throw new IllegalArgumentException("Invalid conversation ID: " + conversationId);
         }
+        
         Conversation conversation = conversationOpt.get();
         User user = conversation.getUser();
 
@@ -72,7 +83,12 @@ public class ConversationService {
         message.setSender(sender);
         message.setTimestamp(LocalDateTime.now());
 
-        messageRepository.save(message);
+        try {
+            messageRepository.save(message);
+            entityManager.flush();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save message", e);
+        }
     }
 
     /** Build chat history string (recent messages) */

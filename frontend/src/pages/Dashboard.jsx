@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header, ChatBubble, ChatInput, LoadingDots, ConversationList } from '../components/common';
-import { chatAPI, authAPI } from '../api';
+import { chatAPI } from '../api';
 
 // Main Dashboard Component
 const MentalHealthChatbot = () => {
@@ -17,27 +17,34 @@ const MentalHealthChatbot = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const conversationListRef = useRef(null);
   const navigate = useNavigate();
 
   // Check authentication and get user data
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('authToken');
+      const storedUser = localStorage.getItem('user');
 
       if (!token) {
         navigate('/login');
         return;
       }
 
-      try {
-        // Use authAPI to get current user profile
-        const userData = await authAPI.getProfile();
-        setUser(userData);
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-        // If profile fetch fails, redirect to login
+      // Use stored user data instead of making API call
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (error) {
+          console.error('Error parsing stored user data:', error);
+          // If user data is corrupted, redirect to login
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          navigate('/login');
+        }
+      } else {
+        // If no user data stored, redirect to login
         localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
         navigate('/login');
       }
     };
@@ -84,6 +91,11 @@ const MentalHealthChatbot = () => {
       }
       
       setMessages(prev => [...prev, botResponse]);
+
+      // Refresh conversation list to include new conversations
+      if (conversationListRef.current) {
+        conversationListRef.current.refreshConversations();
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       
@@ -114,7 +126,7 @@ const MentalHealthChatbot = () => {
       const formattedMessages = response.map(msg => ({
         id: msg.messageId,
         text: msg.content,
-        sender: msg.sender,
+        sender: msg.sender === 'USER' ? 'user' : 'bot', // Normalize sender values
         timestamp: new Date(msg.timestamp)
       }));
       
@@ -198,6 +210,7 @@ const MentalHealthChatbot = () => {
         {/* Conversation List Sidebar */}
         <div className="w-72 flex-shrink-0">
           <ConversationList 
+            ref={conversationListRef}
             onSelectConversation={handleSelectConversation}
             currentConversationId={currentConversationId}
             onNewConversation={handleNewConversation}

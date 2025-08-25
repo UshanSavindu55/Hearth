@@ -25,13 +25,6 @@ export const authAPI = {
     })
   },
 
-  // Get current user profile
-  getProfile: async () => {
-    return apiRequest('/auth/profile', {
-      method: 'GET',
-    })
-  },
-
   // Refresh token
   refreshToken: async () => {
     return apiRequest('/auth/refresh', {

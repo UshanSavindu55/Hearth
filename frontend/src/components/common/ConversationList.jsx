@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { FaComments, FaTrash, FaPlus, FaClock } from 'react-icons/fa';
 import { chatAPI } from '../../api';
 
-const ConversationList = ({ onSelectConversation, currentConversationId, onNewConversation }) => {
+const ConversationList = forwardRef(({ onSelectConversation, currentConversationId, onNewConversation }, ref) => {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -39,20 +39,26 @@ const ConversationList = ({ onSelectConversation, currentConversationId, onNewCo
     fetchConversations();
   }, []);
 
+  // Expose fetchConversations function to parent component
+  useImperativeHandle(ref, () => ({
+    refreshConversations: fetchConversations
+  }));
+
   const formatTimestamp = (date) => {
-    const now = new Date();
-    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return 'Just now';
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    if (diffInHours < 48) return 'Yesterday';
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays} days ago`;
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
   };
 
   const handleDeleteConversation = async (conversationId, event) => {
     event.stopPropagation(); // Prevent triggering the select conversation
+    
+    console.log('Deleting conversation with ID:', conversationId); // Debug log
     
     try {
       // Delete conversation via API
@@ -99,7 +105,7 @@ const ConversationList = ({ onSelectConversation, currentConversationId, onNewCo
             {conversations.map((conversation) => (
               <div
                 key={conversation.id}
-                onClick={() => onSelectConversation(conversation)}
+                onClick={() => onSelectConversation(conversation.id)}
                 className={`
                   p-2.5 rounded cursor-pointer group
                   ${currentConversationId === conversation.id 
@@ -113,9 +119,6 @@ const ConversationList = ({ onSelectConversation, currentConversationId, onNewCo
                     <h3 className="text-sm font-medium truncate">
                       {conversation.title}
                     </h3>
-                    <p className="text-xs text-slate-400 truncate">
-                      {conversation.lastMessage}
-                    </p>
                   </div>
                   <button
                     onClick={(e) => handleDeleteConversation(conversation.id, e)}
@@ -126,7 +129,7 @@ const ConversationList = ({ onSelectConversation, currentConversationId, onNewCo
                 </div>
                 
                 <div className="text-xs text-slate-500 mt-1">
-                  {formatTimestamp(conversation.timestamp)}
+                  Started: {formatTimestamp(conversation.timestamp)}
                 </div>
               </div>
             ))}
@@ -135,6 +138,6 @@ const ConversationList = ({ onSelectConversation, currentConversationId, onNewCo
       </div>
     </div>
   );
-};
+});
 
 export default ConversationList;

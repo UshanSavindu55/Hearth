@@ -21,11 +21,15 @@ public class ChatService {
     @Transactional
     public ChatResponse handleChatRequest(ChatRequest request, String userEmail) {       
         UUID conversationId = conversationService.getOrCreateConversation(request.getConversationId(), userEmail, request.getMessage());
-        
-        // Save user message (title already set during conversation creation if new)
         conversationService.saveMessage(conversationId, request.getMessage(), Message.Sender.USER);
         
-        String botResponse = mentalHealthService.processMessageWithContext(conversationId, request.getMessage(), userEmail);
+        String botResponse;
+        try {
+            botResponse = mentalHealthService.processMessageWithContext(conversationId, request.getMessage(), userEmail);
+        } catch (Exception e) {
+            botResponse = "I'm sorry, I'm having trouble processing your message right now. Please try again.";
+        }
+        
         conversationService.saveMessage(conversationId, botResponse, Message.Sender.BOT);
         return new ChatResponse(conversationId, botResponse);
     }

@@ -68,11 +68,25 @@ public class AuthService {
 
         String token = jwtService.generateToken(userDetails.getUsername());
 
+        // Get user information to include in response
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Create user data map (excluding sensitive information)
+        Map<String, Object> userData = Map.of(
+                "id", user.getId(),
+                "email", user.getEmail(),
+                "name", user.getName()
+        );
+
         SuccessResponse response = new SuccessResponse(
             "login",
             "User authenticated successfully",
             HttpStatus.OK.value(),
-            Map.of("token", token)
+            Map.of(
+                "token", token,
+                "user", userData
+            )
         );
         return ResponseEntity.ok(response);
     }

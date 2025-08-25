@@ -29,6 +29,7 @@ public class ChatController {
     @PostMapping
     public ResponseEntity<ChatResponse> chat(@Valid @RequestBody ChatRequest request, Principal principal){
         String email = principal.getName();
+        System.out.println("Message came to the chat controller : " + request.getMessage() + "and the conversation id is : " + request.getConversationId());
         ChatResponse response = chatService.handleChatRequest(request, email);
         return ResponseEntity.ok(response);
     }

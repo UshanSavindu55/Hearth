@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaSignOutAlt, FaUser, FaCog } from 'react-icons/fa';
+import { authAPI } from '../../api';
 import logo from '../../assets/logo.png';
 
 const Header = ({ user }) => {
@@ -22,10 +23,19 @@ const Header = ({ user }) => {
     };
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      // Call logout API endpoint
+      await authAPI.logout();
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Continue with logout even if API call fails
+    } finally {
+      // Clear local storage and redirect
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      navigate('/login');
+    }
   };
 
   const getUserInitial = () => {

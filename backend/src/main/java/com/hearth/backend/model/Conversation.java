@@ -5,13 +5,16 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Entity
 public class Conversation {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY )
-    private Long conversationId;
+    @GeneratedValue
+    @Column(updatable = false, nullable = false)
+    private UUID conversationId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

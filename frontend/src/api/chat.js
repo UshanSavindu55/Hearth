@@ -2,6 +2,19 @@
 import { apiRequest } from './index'
 
 export const chatAPI = {
+  // Send a message (creating or continuing conversation decides in the backend)
+  sendMessage: async (message, conversationId = null) => {
+    const url = '/chat';
+    
+    return apiRequest(url, {
+      method: 'POST',
+      body: JSON.stringify({ 
+        message,
+        conversationId 
+      }),
+    })
+  },
+
   // Get all conversations for the user
   getConversations: async () => {
     return apiRequest('/chat/conversations', {
@@ -16,22 +29,6 @@ export const chatAPI = {
     })
   },
 
-  // Send a new message
-  sendMessage: async (conversationId, messageData) => {
-    return apiRequest(`/chat/conversations/${conversationId}/messages`, {
-      method: 'POST',
-      body: JSON.stringify(messageData),
-    })
-  },
-
-  // Create a new conversation
-  createConversation: async (conversationData) => {
-    return apiRequest('/chat/conversations', {
-      method: 'POST',
-      body: JSON.stringify(conversationData),
-    })
-  },
-
   // Delete a conversation
   deleteConversation: async (conversationId) => {
     return apiRequest(`/chat/conversations/${conversationId}`, {
@@ -39,21 +36,11 @@ export const chatAPI = {
     })
   },
 
-  // Get emotion analysis for a message
-  getEmotionAnalysis: async (messageData) => {
-    return apiRequest('/chat/emotion-analysis', {
-      method: 'POST',
-      body: JSON.stringify(messageData),
-    })
-  },
-
-  // Search messages
-  searchMessages: async (query) => {
-    return apiRequest('/chat/search', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+  // Update conversation title
+  updateConversationTitle: async (conversationId, title) => {
+    return apiRequest(`/chat/conversations/${conversationId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ title }),
     })
   },
 }

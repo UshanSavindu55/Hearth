@@ -22,11 +22,11 @@ const ChatInput = ({ onSend, disabled }) => {
     <div className="border-t border-slate-700 bg-slate-800 p-4">
       <div className="flex space-x-3">
         <input
-          type="text"
+          type='text'
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Type your message here..."
+          placeholder='Type your message here .......'
           disabled={disabled}
           className="flex-1 px-4 py-2 border border-slate-600 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
         />

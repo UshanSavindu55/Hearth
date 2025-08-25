@@ -6,7 +6,6 @@ import com.hearth.backend.dto.ConversationDto;
 import com.hearth.backend.dto.MessageDto;
 import com.hearth.backend.model.Conversation;
 import com.hearth.backend.model.Message;
-import com.hearth.backend.service.MentalHealthService;
 import com.hearth.backend.service.ChatService;
 
 import jakarta.validation.Valid;
@@ -16,27 +15,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
-
-    @Autowired
-    MentalHealthService mentalHealthService;
     
     @Autowired
     ChatService chatService;
 
     @PostMapping
-    public ResponseEntity<ChatResponse> chat(@RequestParam(required = false) Long conversationId,
-                                             @Valid @RequestBody ChatRequest request,
-                                             Principal principal){
+    public ResponseEntity<ChatResponse> chat(@Valid @RequestBody ChatRequest request, Principal principal){
         String email = principal.getName();
-        String userMessage = request.getMessage();
-
-        ChatResponse response = mentalHealthService.handleUserMessage(conversationId, email, userMessage);
+        ChatResponse response = chatService.handleChatRequest(request, email);
         return ResponseEntity.ok(response);
     }
     
@@ -59,7 +52,7 @@ public class ChatController {
     
     @GetMapping("/conversations/{conversationId}/messages")
     public ResponseEntity<List<MessageDto>> getConversationMessages(
-            @PathVariable Long conversationId, 
+            @PathVariable UUID conversationId, 
             Principal principal) {
         String email = principal.getName();
         List<Message> messages = chatService.getConversationMessages(conversationId, email);
@@ -74,5 +67,14 @@ public class ChatController {
                 .collect(Collectors.toList());
                 
         return ResponseEntity.ok(messageDtos);
+    }
+    
+    @DeleteMapping("/conversations/{conversationId}")
+    public ResponseEntity<Void> deleteConversation(
+            @PathVariable UUID conversationId, 
+            Principal principal) {
+        String email = principal.getName();
+        chatService.deleteConversation(conversationId, email);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaComments, FaTrash, FaPlus, FaClock } from 'react-icons/fa';
-import { apiRequest } from '../../api';
+import { chatAPI } from '../../api';
 
 const ConversationList = ({ onSelectConversation, currentConversationId, onNewConversation }) => {
   const [conversations, setConversations] = useState([]);
@@ -14,9 +14,7 @@ const ConversationList = ({ onSelectConversation, currentConversationId, onNewCo
   const fetchConversations = async () => {
     try {
       setLoading(true);
-      const response = await apiRequest('/chat/conversations', {
-        method: 'GET'
-      });
+      const response = await chatAPI.getConversations();
       
       // Transform the data to match our component's expected format
       const transformedConversations = response.map(conv => ({
@@ -53,9 +51,19 @@ const ConversationList = ({ onSelectConversation, currentConversationId, onNewCo
     return `${diffInDays} days ago`;
   };
 
-  const handleDeleteConversation = (conversationId, event) => {
+  const handleDeleteConversation = async (conversationId, event) => {
     event.stopPropagation(); // Prevent triggering the select conversation
-    setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+    
+    try {
+      // Delete conversation via API
+      await chatAPI.deleteConversation(conversationId);
+      
+      // Remove from local state after successful deletion
+      setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      // You could add a toast notification here to inform the user of the error
+    }
   };
 
   return (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header, ChatBubble, ChatInput, LoadingDots, ConversationList } from '../components/common';
-import { apiRequest } from '../api';
+import { chatAPI, authAPI } from '../api';
 
 // Main Dashboard Component
 const MentalHealthChatbot = () => {
@@ -21,17 +21,28 @@ const MentalHealthChatbot = () => {
 
   // Check authentication and get user data
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('user');
+    const checkAuth = async () => {
+      const token = localStorage.getItem('authToken');
 
-    if (!token) {
-      navigate('/login');
-      return;
-    }
+      if (!token) {
+        navigate('/login');
+        return;
+      }
 
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
+      try {
+        // Use authAPI to get current user profile
+        const userData = await authAPI.getProfile();
+        setUser(userData);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        // If profile fetch fails, redirect to login
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        navigate('/login');
+      }
+    };
+
+    checkAuth();
   }, [navigate]);
 
   // Auto scroll to bottom
@@ -56,14 +67,8 @@ const MentalHealthChatbot = () => {
     setIsLoading(true);
 
     try {
-      // Send message to backend
-      const response = await apiRequest('/chat', {
-        method: 'POST',
-        body: JSON.stringify({
-          message: messageText,
-          conversationId: currentConversationId
-        })
-      });
+      // Send message to backend using chatAPI
+      const response = await chatAPI.sendMessage(messageText, currentConversationId);
 
       // Add bot response
       const botResponse = {
@@ -73,8 +78,8 @@ const MentalHealthChatbot = () => {
         timestamp: new Date()
       };
       
-      // Update conversation ID if this is a new conversation
-      if (response.conversationId && !currentConversationId) {
+      // Update conversation ID from response (for new conversations or corrections)
+      if (response.conversationId) {
         setCurrentConversationId(response.conversationId);
       }
       
@@ -102,12 +107,12 @@ const MentalHealthChatbot = () => {
     setIsLoading(true);
     
     try {
-      // Load messages for this conversation
-      const response = await apiRequest(`/chat/conversations/${conversationId}/messages`);
+      // Load messages for this conversation using chatAPI
+      const response = await chatAPI.getMessages(conversationId);
       
       // Transform backend messages to frontend format
       const formattedMessages = response.map(msg => ({
-        id: msg.id,
+        id: msg.messageId,
         text: msg.content,
         sender: msg.sender,
         timestamp: new Date(msg.timestamp)
@@ -163,7 +168,7 @@ const MentalHealthChatbot = () => {
         <div className="flex-1 p-6 flex flex-col">
           <div className="flex-1 bg-slate-800 rounded-xl flex flex-col overflow-hidden">
             
-            {/* Messages Area - Scrollable */}
+            {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-6" style={{scrollbarWidth: 'thin', scrollbarColor: '#64748b #334155'}}>
               {messages.map((message) => (
                 <div key={message.id} className="mb-4">
